@@ -1,0 +1,12 @@
+<h1>{{.ExistingTitle}}</h1>
+
+<h4>Description</h4>
+<p>{{printf "%s" .ExistingDescription}}</p>
+<h4>Due</h4>
+<p>{{printf "%s/%s/%s %s:00" .ExistingDueYear .ExistingDueMonth .ExistingDueDay .ExistingDueHour}}</p>
+<h4>Priority</h4>
+<p>{{printf "%s" .ExistingPriority}}</p>
+<h4>Status</h4>
+<p>{{printf "%s" .ExistingStatus}}</p>
+
+<p>[<a href="/update/{{.Title}}">update</a>]</p>

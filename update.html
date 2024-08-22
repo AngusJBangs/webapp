@@ -1,0 +1,25 @@
+<h1>{{.ExistingTitle}}</h1>
+
+<h4>Description</h4>
+<p>{{printf "%s" .ExistingDescription}}</p>
+<h4>Due</h4>
+<p>{{printf "%s/%s/%s %s:00" .ExistingDueYear .ExistingDueMonth .ExistingDueDay .ExistingDueHour}}</p>
+<h4>Priority</h4>
+<p>{{printf "%s" .ExistingPriority}}</p>
+<h4>Status</h4>
+<p>{{printf "%s" .ExistingStatus}}</p>
+
+<form action="/commitupdate/{{.Title}}" method="POST">
+    <input type="hidden" name="existingtitle" value={{.ExistingTitle}} >
+    <div>Title: <textarea name="title" rows="1" cols="80">{{printf "%s" .ExistingTitle}}</textarea></div>
+    <div>Description: <textarea name="description" rows="4" cols="80">{{printf "%s" .ExistingDescription}}</textarea></div>
+    <div>Due:</div>
+    <div>Year: <textarea name="dueyear" rows="1" cols="15">{{printf "%s" .ExistingDueYear}}</textarea>
+    Month: <textarea name="duemonth" rows="1" cols="15">{{printf "%s" .ExistingDueMonth}}</textarea>
+    Day: <textarea name="dueday" rows="1" cols="15">{{printf "%s" .ExistingDueDay}}</textarea>
+    Hour: <textarea name="duehour" rows="1" cols="15">{{printf "%s" .ExistingDueHour}}</textarea></div>
+    <div>Priority: <textarea name="priority" rows="1" cols="15">{{printf "%s" .ExistingPriority}}</textarea></div>
+    <div>Status: <textarea name="status" rows="1" cols="80">{{printf "%s" .ExistingStatus}}</textarea></div>
+    <br></br>
+    <div><input type="submit" value="Update"></div>
+</form>
