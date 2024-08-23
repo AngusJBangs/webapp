@@ -12,9 +12,9 @@ import (
 	"time"
 )
 
-var templates = template.Must(template.ParseFiles("read.html", "readall.html", "update.html"))
+var templates = template.Must(template.ParseFiles("read.html", "readall.html", "update.html", "create.html"))
 
-var validPath = regexp.MustCompile("^/(read|update|commitupdate)/([a-zA-Z0-9]+)$")
+var validPath = regexp.MustCompile("^/(read|update|commitupdate|create|commitcreate|delete)/([a-zA-Z0-9]+)$")
 var sampleToDos = MakeSampleToDos()
 
 type ToDo struct {
@@ -89,6 +89,30 @@ func readHandler(w http.ResponseWriter, r *http.Request, title string) {
 	}
 }
 
+func createHandler(w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+	year := strconv.Itoa(now.Year())
+	month := strconv.Itoa(int(now.Month()))
+	day := strconv.Itoa(now.Day())
+	p := Page{ExistingDueYear: year, ExistingDueMonth: month, ExistingDueDay: day}
+	renderTemplate(w, "create", &p)
+}
+
+func deleteHandler(w http.ResponseWriter, r *http.Request, title string) {
+	tds := append([]ToDo{}, sampleToDos...)
+	for i, td := range sampleToDos {
+		if strings.EqualFold(strings.ReplaceAll(td.Title, " ", ""), title) {
+			before := tds[:i]
+			after := []ToDo{}
+			if i < len(tds) {
+				after = tds[i+1:]
+			}
+			sampleToDos = append(before, after...)
+		}
+	}
+	http.Redirect(w, r, "/readall/", http.StatusFound)
+}
+
 func updateHandler(w http.ResponseWriter, r *http.Request, title string) {
 	for _, td := range sampleToDos {
 		if strings.EqualFold(strings.ReplaceAll(td.Title, " ", ""), title) {
@@ -109,11 +133,39 @@ func updator(update ToDo, oldTitle string) {
 	}
 }
 
+func commitCreateHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.FormValue("title")
+	description := r.FormValue("description")
+	dueYear, err := strconv.Atoi(r.FormValue("dueyear"))
+	if err != nil {
+		fmt.Println("error!")
+	}
+	dueMonth, err := strconv.Atoi(r.FormValue("duemonth"))
+	if err != nil {
+		fmt.Println("error!")
+	}
+	dueDay, err := strconv.Atoi(r.FormValue("dueday"))
+	if err != nil {
+		fmt.Println("error!")
+	}
+	dueHour, err := strconv.Atoi(r.FormValue("duehour"))
+	if err != nil {
+		fmt.Println("error!")
+	}
+	priority, err := strconv.Atoi(r.FormValue("priority"))
+	if err != nil {
+		fmt.Println("error!")
+	}
+	status := r.FormValue("status")
+	due := time.Date(dueYear, time.Month(dueMonth), dueDay, dueHour, 0, 0, 0, time.Local)
+	newToDo := ToDo{title, description, due, priority, status}
+	sampleToDos = append(sampleToDos, newToDo)
+	http.Redirect(w, r, "/read/"+strings.ReplaceAll(newToDo.Title, " ", ""), http.StatusFound)
+}
+
 func commitUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 	description := r.FormValue("description")
-	fmt.Println("description:")
-	fmt.Println(description)
 	dueYear, err := strconv.Atoi(r.FormValue("dueyear"))
 	if err != nil {
 		fmt.Println("error!")
@@ -149,16 +201,18 @@ func readAllHandler(w http.ResponseWriter, r *http.Request) {
 		body = append(body, []byte(td.Title)...)
 		body = append(body, []byte(" - ")...)
 	}
+	body = body[:len(body)-3]
 	p := Page{Title: "All To-dos", Body: body}
 	renderTemplate(w, "readall", &p)
 }
 
 func main() {
-	// http.HandleFunc("/create/", makeHandler(createHandler))
+	http.HandleFunc("/create/", createHandler)
 	http.HandleFunc("/read/", makeHandler(readHandler))
 	http.HandleFunc("/readall/", (readAllHandler))
 	http.HandleFunc("/update/", makeHandler(updateHandler))
-	// http.HandleFunc("/delete/", makeHandler(deleteHandler))
+	http.HandleFunc("/delete/", makeHandler(deleteHandler))
 	http.HandleFunc("/commitupdate/", commitUpdateHandler)
+	http.HandleFunc("/commitcreate/", commitCreateHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

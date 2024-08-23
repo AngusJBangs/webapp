@@ -1,0 +1,15 @@
+<h1>Create a to-do item</h1>
+
+<form action="/commitcreate/" method="POST">
+    <div>Title: <textarea name="title" rows="1" cols="80"></textarea></div>
+    <div>Description: <textarea name="description" rows="4" cols="80"></textarea></div>
+    <div>Due:</div>
+    <div>Year: <textarea name="dueyear" rows="1" cols="15">{{.ExistingDueYear}}</textarea>
+    Month: <textarea name="duemonth" rows="1" cols="15">{{.ExistingDueMonth}}</textarea>
+    Day: <textarea name="dueday" rows="1" cols="15">{{.ExistingDueDay}}</textarea>
+    Hour: <textarea name="duehour" rows="1" cols="15"></textarea></div>
+    <div>Priority: <textarea name="priority" rows="1" cols="15"></textarea></div>
+    <div>Status: <textarea name="status" rows="1" cols="80">not started</textarea></div>
+    <br></br>
+    <div><input type="submit" value="Create"></div>
+</form>
